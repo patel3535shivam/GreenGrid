@@ -1,0 +1,12 @@
+﻿Django==4.2.16
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.3.1
+PyMySQL==1.1.0
+python-decouple==3.8
+Pillow>=10.4.0
+pandas>=2.2.0
+numpy>=2.0.0
+scikit-learn>=1.5.0
+APScheduler==3.10.4
+openpyxl>=3.1.2
