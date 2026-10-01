@@ -6,6 +6,7 @@ import { cancelRouteRequests } from '../api/axiosInstance';
 import pageLoaders from './pageLoaders';
 import AppLayout from '../components/layout/AppLayout';
 import LoginPage from '../pages/Login/LoginPage';
+import LandingPage from '../pages/Landing/LandingPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 
 const DashboardPage = lazy(pageLoaders['/dashboard']);
@@ -60,14 +61,15 @@ const AppRouter = () => (
   <>
     <RouteRequestLifecycle />
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route element={<PrivateRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={renderPage(DashboardPage)} />
           <Route path="/facilities" element={renderPage(FacilitiesPage)} />
           <Route path="/energy-monitoring" element={renderPage(EnergyMonitoringPage)} />
           <Route path="/billing" element={renderPage(BillingPage)} />
+          <Route path="/renewable" element={<Navigate to="/renewable-energy" replace />} />
           <Route path="/renewable-energy" element={renderPage(RenewablePage)} />
           <Route path="/analytics" element={renderPage(AnalyticsPage)} />
           <Route path="/forecast" element={renderPage(ForecastPage)} />

@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { facilitiesApi } from '../../api/facilitiesApi';
-import { Grid, ChevronDown, Sun, Search, Bell, HelpCircle } from 'lucide-react';
+import { Grid, ChevronDown, Sun, Search, Bell, HelpCircle, ArrowRight } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = ({ isLanding = false }) => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
   const [facilityCount, setFacilityCount] = useState(12);
+  const isLandingRoute = isLanding || location.pathname === '/';
 
   useEffect(() => {
     facilitiesApi.getSummary()
@@ -33,11 +34,23 @@ const Navbar = () => {
   });
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0 z-10">
-      <div className="flex items-center">
-        <div className="text-sm text-gray-500">
-          Home <span className="mx-1">&gt;</span> <span className="text-gray-900 font-medium">{getBreadcrumb()}</span>
-        </div>
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0 z-20 sticky top-0">
+      <div className="flex items-center gap-3">
+        {isLandingRoute ? (
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center font-bold text-white text-xl shadow-xs group-hover:bg-green-600 transition-colors">
+              G
+            </div>
+            <div>
+              <div className="font-bold text-slate-900 tracking-tight text-base leading-none">GreenGrid</div>
+              <div className="text-[10px] text-slate-400 font-medium mt-0.5">Smart Energy System</div>
+            </div>
+          </Link>
+        ) : (
+          <div className="text-sm text-gray-500">
+            Home <span className="mx-1">&gt;</span> <span className="text-gray-900 font-medium">{getBreadcrumb()}</span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center space-x-4 ml-8">
@@ -90,16 +103,26 @@ const Navbar = () => {
 
         <div className="h-6 w-px bg-gray-200 mx-2"></div>
 
-        <button className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded-md transition-colors">
-          <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">
-            {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
-          </div>
-          <div className="text-left hidden md:block">
-            <div className="text-sm font-medium text-gray-900 leading-tight">{user?.full_name || 'System Admin'}</div>
-            <div className="text-xs text-gray-500 leading-tight">{user?.role || 'Administrator'}</div>
-          </div>
-          <ChevronDown className="w-4 h-4 text-gray-500" />
-        </button>
+        {user ? (
+          <Link to="/dashboard" className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded-md transition-colors">
+            <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="text-left hidden md:block">
+              <div className="text-sm font-medium text-gray-900 leading-tight">{user?.full_name || 'System Admin'}</div>
+              <div className="text-xs text-gray-500 leading-tight">{user?.role || 'Administrator'}</div>
+            </div>
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          </Link>
+        ) : (
+          <Link
+            to="/login"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold transition-colors shadow-xs"
+          >
+            <span>Sign In</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        )}
       </div>
     </header>
   );
