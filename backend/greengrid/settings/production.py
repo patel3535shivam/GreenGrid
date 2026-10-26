@@ -4,12 +4,27 @@ import os
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# Read ALLOWED_HOSTS from env (defaults to localhost, 127.0.0.1, and any .onrender.com domain)
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com').split(',')
-    if h.strip()
-]
+# Robust ALLOWED_HOSTS Configuration
+# Parses comma-separated values, strips schemes (http/https), quotes, and trailing slashes.
+# Automatically includes Render external hostname and .onrender.com wildcard.
+raw_allowed_hosts = config('ALLOWED_HOSTS', default='*')
+ALLOWED_HOSTS = []
+for host in raw_allowed_hosts.split(','):
+    host = host.strip().strip("'\"").rstrip('/')
+    if host.startswith('https://'):
+        host = host[len('https://'):]
+    elif host.startswith('http://'):
+        host = host[len('http://'):]
+    host = host.rstrip('/')
+    if host:
+        ALLOWED_HOSTS.append(host)
+
+render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_external_hostname)
+
+if '.onrender.com' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(['.onrender.com', 'localhost', '127.0.0.1'])
 
 # Database configuration: support DATABASE_URL (for Render PostgreSQL) or MySQL or SQLite fallback
 DATABASE_URL = config('DATABASE_URL', default=None)
@@ -59,7 +74,8 @@ CORS_ALLOWED_ORIGINS = [
     for origin in config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://127.0.0.1:5173').split(',')
     if origin.strip()
 ]
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
+# Default to allowing all origins so that frontend deployments are not blocked
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 CORS_ALLOW_CREDENTIALS = True
 
 # Security enhancements for production when behind Render's reverse proxy

@@ -7,11 +7,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
-ALLOWED_HOSTS = [
-    h.strip() 
-    for h in config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com').split(',') 
-    if h.strip()
-]
+# Robust ALLOWED_HOSTS Configuration
+# Parses comma-separated values, strips schemes (http/https), quotes, and trailing slashes.
+# Always ensures Render hostnames, wildcards, and local development hosts are valid.
+raw_allowed_hosts = config('ALLOWED_HOSTS', default='*')
+ALLOWED_HOSTS = []
+for host in raw_allowed_hosts.split(','):
+    host = host.strip().strip("'\"").rstrip('/')
+    if host.startswith('https://'):
+        host = host[len('https://'):]
+    elif host.startswith('http://'):
+        host = host[len('http://'):]
+    host = host.rstrip('/')
+    if host:
+        ALLOWED_HOSTS.append(host)
+
+# Automatically register Render external hostname if provided by environment
+render_external_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_external_hostname)
+
+# Default fallback to guarantee Render and localhost work
+if '.onrender.com' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(['.onrender.com', 'localhost', '127.0.0.1'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
