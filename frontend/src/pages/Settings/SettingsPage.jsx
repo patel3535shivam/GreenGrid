@@ -81,7 +81,8 @@ export default function SettingsPage() {
       setError('');
       await authApi.changePassword({
         current_password: passwordData.current_password,
-        new_password: passwordData.new_password
+        new_password: passwordData.new_password,
+        confirm_password: passwordData.confirm_password
       });
       setMessage('Password updated successfully!');
       setPasswordData({ current_password: '', new_password: '', confirm_password: '' });

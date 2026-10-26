@@ -4,8 +4,8 @@ import os
 import sys
 
 def main():
-    """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'greengrid.settings.development')
+    default_settings = 'greengrid.settings.production' if os.environ.get('RENDER') else 'greengrid.settings.development'
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', default_settings)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

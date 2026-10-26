@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { facilitiesApi } from '../../api/facilitiesApi';
-import { Grid, ChevronDown, Sun, Search, Bell, HelpCircle, ArrowRight } from 'lucide-react';
+import { Grid, ChevronDown, Sun, Search, Bell, HelpCircle, ArrowRight, LogOut } from 'lucide-react';
 
 const Navbar = ({ isLanding = false }) => {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
   const [facilityCount, setFacilityCount] = useState(12);
   const isLandingRoute = isLanding || location.pathname === '/';
 
@@ -104,16 +105,30 @@ const Navbar = ({ isLanding = false }) => {
         <div className="h-6 w-px bg-gray-200 mx-2"></div>
 
         {user ? (
-          <Link to="/dashboard" className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded-md transition-colors">
-            <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <div className="text-left hidden md:block">
-              <div className="text-sm font-medium text-gray-900 leading-tight">{user?.full_name || 'System Admin'}</div>
-              <div className="text-xs text-gray-500 leading-tight">{user?.role || 'Administrator'}</div>
-            </div>
-            <ChevronDown className="w-4 h-4 text-gray-500" />
-          </Link>
+          <>
+            <Link to="/dashboard" className="flex items-center space-x-2 hover:bg-gray-50 p-1 rounded-md transition-colors">
+              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">
+                {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div className="text-left hidden md:block">
+                <div className="text-sm font-medium text-gray-900 leading-tight">{user?.full_name || 'System Admin'}</div>
+                <div className="text-xs text-gray-500 leading-tight">{user?.role || 'Administrator'}</div>
+              </div>
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            </Link>
+            <button
+              type="button"
+              aria-label="Log out"
+              title="Log out"
+              onClick={async () => {
+                await logout();
+                navigate('/login', { replace: true });
+              }}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </>
         ) : (
           <Link
             to="/login"

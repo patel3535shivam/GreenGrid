@@ -1,4 +1,4 @@
-﻿Django==4.2.16
+Django==4.2.16
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 django-cors-headers==4.3.1
@@ -10,3 +10,6 @@ numpy>=2.0.0
 scikit-learn>=1.5.0
 APScheduler==3.10.4
 openpyxl>=3.1.2
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+dj-database-url>=2.1.0
